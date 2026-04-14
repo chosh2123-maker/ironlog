@@ -1,0 +1,721 @@
+  <!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IRON LOG">
+<meta name="theme-color" content="#0a0a0a">
+<title>IRON LOG</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg2: #111;
+  --bg3: #1a1a1a;
+  --border: #222;
+  --border2: #2a2a2a;
+  --text: #e8e8e8;
+  --text2: #aaa;
+  --text3: #555;
+  --radius: 12px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', -apple-system, sans-serif;
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* ── LAYOUT ── */
+#app {
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* iPad: 사이드바 레이아웃 */
+@media (min-width: 768px) {
+  #sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding-top: calc(var(--safe-top) + 20px);
+    padding-left: calc(var(--safe-left) + 20px);
+    padding-right: 20px;
+    padding-bottom: 20px;
+  }
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #mobile-header { display: none !important; }
+  #bottom-tabs { display: none !important; }
+}
+
+/* iPhone: 상단헤더 + 하단탭 레이아웃 */
+@media (max-width: 767px) {
+  #sidebar { display: none !important; }
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
+
+/* ── SIDEBAR (iPad) ── */
+#sidebar {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.sidebar-logo {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 32px;
+  letter-spacing: 5px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.sidebar-badge {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 28px;
+  display: block;
+}
+.sidebar-section {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.sidebar-day {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  transition: all .15s;
+}
+.sidebar-day.rest { opacity: 0.3; pointer-events: none; }
+.sidebar-day.selected { background: #1a1a1a; border-color: var(--accent); }
+.sidebar-day-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text3);
+  flex-shrink: 0;
+}
+.sidebar-day.selected .sidebar-day-dot { background: var(--accent); }
+.sidebar-day-label { font-size: 13px; color: var(--text2); }
+.sidebar-day.selected .sidebar-day-label { color: var(--accent); font-weight: 700; }
+.sidebar-day-sub { font-size: 10px; color: var(--text3); }
+.today-badge {
+  margin-left: auto;
+  font-size: 9px;
+  background: #fff;
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+.sidebar-nav {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.sidebar-nav-btn {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all .15s;
+}
+.sidebar-nav-btn.active { background: #1a1a1a; color: #fff; }
+
+/* ── MOBILE HEADER ── */
+#mobile-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: calc(var(--safe-top) + 12px) 20px 0;
+  flex-shrink: 0;
+}
+.mh-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.mh-logo {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 26px;
+  letter-spacing: 4px;
+  color: #fff;
+}
+.mh-badge {
+  font-size: 11px;
+  background: #1e1e1e;
+  color: var(--text3);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #333;
+}
+.mh-tabs { display: flex; }
+.mh-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text3);
+  padding: 10px 0;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+}
+.mh-tab.active { color: #fff; border-bottom-color: #fff; }
+
+/* ── SCROLL AREA ── */
+#scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── BOTTOM TABS (iPhone) ── */
+#bottom-tabs {
+  display: flex;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding-bottom: var(--safe-bottom);
+  flex-shrink: 0;
+}
+.bt-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px 0 8px;
+  font-size: 10px;
+  color: var(--text3);
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: color .15s;
+}
+.bt-btn.active { color: #fff; }
+.bt-icon { font-size: 20px; }
+
+/* ── DAY ROW (mobile) ── */
+.day-row {
+  display: flex;
+  gap: 6px;
+  padding: 16px 20px 0;
+  justify-content: center;
+}
+.day-btn {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: #151515;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  position: relative;
+  font-family: inherit;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.day-btn.rest { opacity: 0.3; pointer-events: none; }
+.day-btn.selected { border-width: 2px; font-weight: 700; background: #1a1a1a; }
+.today-dot {
+  position: absolute;
+  bottom: 3px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* ── ROUTINE HEADER ── */
+.routine-header {
+  margin: 16px 20px 0;
+  padding: 16px;
+  background: var(--bg2);
+  border-radius: var(--radius);
+  border: 1px solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .routine-header { margin: 20px 24px 0; padding: 20px; }
+}
+.routine-icon { font-size: 28px; }
+.routine-label { font-size: 18px; font-weight: 700; margin-left: 8px; }
+.routine-desc { display: block; font-size: 11px; color: var(--text3); margin-top: 2px; margin-left: 36px; }
+.progress-wrap { text-align: right; min-width: 80px; }
+.progress-pct { font-size: 22px; font-weight: 700; color: #fff; }
+.progress-bar { height: 4px; background: #222; border-radius: 2px; margin-top: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 2px; transition: width .3s ease; }
+.progress-sub { font-size: 10px; color: var(--text3); margin-top: 2px; display: block; }
+
+/* ── EXERCISE LIST ── */
+.exercise-list {
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .exercise-list { padding: 16px 24px 24px; }
+}
+
+/* iPad: 2열 그리드 */
+@media (min-width: 900px) {
+  .exercise-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+}
+
+.ex-card {
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid #1e1e1e;
+}
+.ex-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.ex-name { font-weight: 600; font-size: 14px; color: #ddd; }
+.ex-rep { font-size: 11px; font-weight: 600; }
+.set-grid {
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr 36px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.set-label { font-size: 10px; color: #444; text-align: center; }
+.set-num { font-size: 12px; color: var(--text3); text-align: center; }
+.set-input {
+  background: #1a1a1a;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: #ddd;
+  font-size: 15px;
+  padding: 8px 4px;
+  text-align: center;
+  width: 100%;
+  font-family: inherit;
+  outline: none;
+  -webkit-appearance: none;
+}
+.set-input:focus { border-color: #555; }
+.check-btn {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  font-family: inherit;
+}
+.set-row.done { opacity: 0.4; }
+
+/* ── HISTORY ── */
+.history-wrap { padding: 20px; }
+@media (min-width: 768px) { .history-wrap { padding: 24px; } }
+.history-title { font-size: 13px; color: var(--text3); margin-bottom: 14px; }
+
+@media (min-width: 768px) {
+  .hist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+}
+
+.hist-card {
+  background: var(--bg2);
+  border-radius: 10px;
+  border: 1px solid;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+@media (min-width: 768px) { .hist-card { margin-bottom: 0; } }
+.hist-header { margin-bottom: 10px; font-size: 13px; font-weight: 700; }
+.hist-ex { margin-bottom: 8px; }
+.hist-ex-name { font-size: 12px; color: #777; display: block; margin-bottom: 4px; }
+.hist-sets { display: flex; flex-wrap: wrap; gap: 6px; }
+.hist-set {
+  font-size: 11px;
+  background: #1a1a1a;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: #ccc;
+}
+.empty { color: #444; font-size: 13px; text-align: center; margin-top: 60px; }
+
+/* ── PAGE ── */
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- iPad 사이드바 -->
+  <div id="sidebar">
+    <div class="sidebar-logo">IRON LOG</div>
+    <span class="sidebar-badge">80kg · 180cm · 근비대</span>
+    <div class="sidebar-section">이번 주 루틴</div>
+    <div id="sidebar-days"></div>
+    <div class="sidebar-nav">
+      <button class="sidebar-nav-btn active" onclick="switchTab('workout',this)">🏋️ 오늘 운동</button>
+      <button class="sidebar-nav-btn" onclick="switchTab('history',this)">📋 기록 보기</button>
+    </div>
+  </div>
+
+  <!-- 메인 영역 -->
+  <div id="main">
+    <!-- iPhone 헤더 -->
+    <div id="mobile-header">
+      <div class="mh-top">
+        <span class="mh-logo">IRON LOG</span>
+        <span class="mh-badge">80kg · 180cm</span>
+      </div>
+      <div class="mh-tabs">
+        <button class="mh-tab active" onclick="switchTab('workout',this)">오늘 운동</button>
+        <button class="mh-tab" onclick="switchTab('history',this)">기록 보기</button>
+      </div>
+    </div>
+
+    <!-- 스크롤 영역 -->
+    <div id="scroll-area">
+      <div id="page-workout" class="page active"></div>
+      <div id="page-history" class="page"></div>
+    </div>
+
+    <!-- iPhone 하단 탭 -->
+    <div id="bottom-tabs">
+      <button class="bt-btn active" onclick="switchTab('workout',this)">
+        <span class="bt-icon">🏋️</span>오늘 운동
+      </button>
+      <button class="bt-btn" onclick="switchTab('history',this)">
+        <span class="bt-icon">📋</span>기록 보기
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROUTINE = {
+  월:{label:"상체 Push",color:"#FF6B35",icon:"💪",desc:"가슴 · 어깨 · 삼두",exercises:[
+    {name:"바벨 벤치프레스",sets:4,rep:"6–8"},
+    {name:"인클라인 덤벨 프레스",sets:3,rep:"8–10"},
+    {name:"케이블 플라이",sets:3,rep:"12–15"},
+    {name:"덤벨 숄더프레스",sets:3,rep:"8–10"},
+    {name:"레터럴 레이즈",sets:3,rep:"12–15"},
+    {name:"트라이셉스 푸시다운",sets:3,rep:"12–15"},
+  ]},
+  화:{label:"하체 + 코어",color:"#4ECDC4",icon:"🦵",desc:"대퇴 · 햄스트링 · 코어",exercises:[
+    {name:"바벨 스쿼트",sets:4,rep:"6–8"},
+    {name:"루마니안 데드리프트",sets:3,rep:"8–10"},
+    {name:"레그 프레스",sets:3,rep:"10–12"},
+    {name:"레그 컬 (머신)",sets:3,rep:"12–15"},
+    {name:"카프 레이즈",sets:4,rep:"15–20"},
+    {name:"플랭크",sets:3,rep:"60초"},
+  ]},
+  목:{label:"상체 Pull",color:"#A855F7",icon:"🏋️",desc:"등 · 이두",exercises:[
+    {name:"바벨 데드리프트",sets:4,rep:"5–6"},
+    {name:"렛풀다운",sets:3,rep:"8–10"},
+    {name:"시티드 케이블 로우",sets:3,rep:"10–12"},
+    {name:"덤벨 원암 로우",sets:3,rep:"10–12"},
+    {name:"페이스풀",sets:3,rep:"15"},
+    {name:"바벨 컬",sets:3,rep:"10–12"},
+  ]},
+  금:{label:"하체 + 어깨 보조",color:"#F59E0B",icon:"⚡",desc:"하체 · 후면 삼각근",exercises:[
+    {name:"핵 스쿼트",sets:4,rep:"8–10"},
+    {name:"불가리안 스플릿 스쿼트",sets:3,rep:"10 (각)"},
+    {name:"레그 익스텐션",sets:3,rep:"12–15"},
+    {name:"시티드 카프 레이즈",sets:3,rep:"15–20"},
+    {name:"리어 델트 플라이",sets:3,rep:"15"},
+    {name:"업라이트 로우",sets:3,rep:"12"},
+  ]},
+};
+const DAYS=["월","화","수","목","금","토","일"];
+const REST=["수","토","일"];
+const KEY="ironlog_v2";
+
+let log=JSON.parse(localStorage.getItem(KEY)||"{}");
+let selDay=(()=>{const d=new Date();const k=DAYS[d.getDay()===0?6:d.getDay()-1];return REST.includes(k)?"월":k;})();
+let curTab="workout";
+
+function todayDow(){const d=new Date();return DAYS[d.getDay()===0?6:d.getDay()-1];}
+
+function getDateKey(day){
+  const today=new Date();
+  const ti=today.getDay()===0?6:today.getDay()-1;
+  const di=DAYS.indexOf(day);
+  const d=new Date(today);
+  d.setDate(today.getDate()+(di-ti));
+  return d.toISOString().slice(0,10);
+}
+
+function saveLog(){localStorage.setItem(KEY,JSON.stringify(log));}
+
+function getEntry(dk,ei,si){return log?.[dk]?.[ei]?.[si]||{weight:"",reps:"",done:false};}
+
+function setEntry(dk,ei,si,field,val){
+  if(!log[dk])log[dk]={};
+  if(!log[dk][ei])log[dk][ei]={};
+  if(!log[dk][ei][si])log[dk][ei][si]={weight:"",reps:"",done:false};
+  log[dk][ei][si][field]=val;
+  saveLog();
+}
+
+function calcProg(dk,r){
+  if(!r)return{done:0,total:0};
+  let done=0,total=0;
+  r.exercises.forEach((ex,ei)=>{
+    for(let si=0;si<ex.sets;si++){total++;if(getEntry(dk,ei,si).done)done++;}
+  });
+  return{done,total};
+}
+
+// ── TAB SWITCH ──
+function switchTab(tab, btn){
+  curTab=tab;
+  // mobile header tabs
+  document.querySelectorAll('.mh-tab').forEach(t=>t.classList.remove('active'));
+  // bottom tabs
+  document.querySelectorAll('.bt-btn').forEach(t=>t.classList.remove('active'));
+  // sidebar nav
+  document.querySelectorAll('.sidebar-nav-btn').forEach(t=>t.classList.remove('active'));
+
+  if(btn) btn.classList.add('active');
+  // sync all matching tabs
+  if(tab==='workout'){
+    document.querySelectorAll('.mh-tab')[0]?.classList.add('active');
+    document.querySelectorAll('.bt-btn')[0]?.classList.add('active');
+    document.querySelectorAll('.sidebar-nav-btn')[0]?.classList.add('active');
+  } else {
+    document.querySelectorAll('.mh-tab')[1]?.classList.add('active');
+    document.querySelectorAll('.bt-btn')[1]?.classList.add('active');
+    document.querySelectorAll('.sidebar-nav-btn')[1]?.classList.add('active');
+  }
+
+  document.getElementById('page-workout').classList.toggle('active',tab==='workout');
+  document.getElementById('page-history').classList.toggle('active',tab==='history');
+  if(tab==='history')renderHistory();
+}
+
+// ── SIDEBAR DAYS (iPad) ──
+function renderSidebar(){
+  const today=todayDow();
+  const el=document.getElementById('sidebar-days');
+  let html='';
+  DAYS.forEach(d=>{
+    const r=ROUTINE[d];
+    const isRest=REST.includes(d);
+    const isSel=d===selDay;
+    const isToday=d===today;
+    const color=r?.color||'#555';
+    const style=`--accent:${color}`;
+    html+=`<div class="sidebar-day${isRest?' rest':''}${isSel?' selected':''}" style="${style}" onclick="selectDay('${d}')">
+      <div class="sidebar-day-dot"></div>
+      <div>
+        <div class="sidebar-day-label">${d}${r?` — ${r.label}`:' — 휴식'}</div>
+        ${r?`<div class="sidebar-day-sub">${r.desc}</div>`:''}
+      </div>
+      ${isToday?'<span class="today-badge">TODAY</span>':''}
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+// ── SELECT DAY ──
+function selectDay(d){
+  if(REST.includes(d))return;
+  selDay=d;
+  renderSidebar();
+  renderWorkout();
+  if(curTab!=='workout')switchTab('workout');
+}
+
+// ── WORKOUT PAGE ──
+function renderWorkout(){
+  const dk=getDateKey(selDay);
+  const r=ROUTINE[selDay];
+  const today=todayDow();
+  const{done,total}=calcProg(dk,r);
+  const pct=total>0?Math.round(done/total*100):0;
+  let html='';
+
+  // Day row (mobile only — iPad uses sidebar)
+  html+='<div class="day-row" id="day-row-mobile">';
+  DAYS.forEach(d=>{
+    const isRest=REST.includes(d);
+    const isSel=d===selDay;
+    const isToday=d===today;
+    const color=ROUTINE[d]?.color||'#555';
+    html+=`<button class="day-btn${isRest?' rest':''}${isSel?' selected':''}"
+      style="${isSel?`border-color:${color};color:${color};`:''}border-color:${isSel?color:''}"
+      onclick="selectDay('${d}')">
+      ${d}${isToday?'<span class="today-dot"></span>':''}
+    </button>`;
+  });
+  html+='</div>';
+
+  if(!r){
+    html+='<p class="empty">오늘은 휴식일입니다 🛌</p>';
+  } else {
+    html+=`<div class="routine-header" style="border-color:${r.color}">
+      <div>
+        <span class="routine-icon">${r.icon}</span>
+        <span class="routine-label" style="color:${r.color}">${r.label}</span>
+        <span class="routine-desc">${r.desc}</span>
+      </div>
+      <div class="progress-wrap">
+        <span class="progress-pct">${pct}%</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="pfill" style="width:${pct}%;background:${r.color}"></div>
+        </div>
+        <span class="progress-sub">${done}/${total} 세트</span>
+      </div>
+    </div>`;
+
+    html+='<div class="exercise-list">';
+    r.exercises.forEach((ex,ei)=>{
+      html+=`<div class="ex-card">
+        <div class="ex-header">
+          <span class="ex-name">${ex.name}</span>
+          <span class="ex-rep" style="color:${r.color}">${ex.rep} reps</span>
+        </div>
+        <div class="set-grid" style="margin-bottom:4px">
+          ${['세트','무게(kg)','횟수','완료'].map(l=>`<span class="set-label">${l}</span>`).join('')}
+        </div>`;
+      for(let si=0;si<ex.sets;si++){
+        const e=getEntry(dk,ei,si);
+        html+=`<div class="set-row set-grid${e.done?' done':''}" id="row-${ei}-${si}">
+          <span class="set-num">${si+1}</span>
+          <input class="set-input" type="number" inputmode="decimal" placeholder="—"
+            value="${e.weight}" onblur="setEntry('${dk}',${ei},${si},'weight',this.value)">
+          <input class="set-input" type="number" inputmode="numeric" placeholder="—"
+            value="${e.reps}" onblur="setEntry('${dk}',${ei},${si},'reps',this.value)">
+          <button class="check-btn" id="chk-${ei}-${si}"
+            style="background:${e.done?r.color:'transparent'};border-color:${e.done?r.color:'#444'}"
+            onclick="toggleDone('${dk}',${ei},${si},'${r.color}')">
+            ${e.done?'✓':''}
+          </button>
+        </div>`;
+      }
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+
+  document.getElementById('page-workout').innerHTML=html;
+}
+
+// ── TOGGLE DONE ──
+function toggleDone(dk,ei,si,color){
+  const cur=getEntry(dk,ei,si);
+  const nd=!cur.done;
+  setEntry(dk,ei,si,'done',nd);
+  const row=document.getElementById(`row-${ei}-${si}`);
+  const btn=document.getElementById(`chk-${ei}-${si}`);
+  if(row)row.classList.toggle('done',nd);
+  if(btn){btn.style.background=nd?color:'transparent';btn.style.borderColor=nd?color:'#444';btn.textContent=nd?'✓':'';}
+  // progress update
+  const r=ROUTINE[selDay];
+  const{done,total}=calcProg(dk,r);
+  const pct=total>0?Math.round(done/total*100):0;
+  const fill=document.getElementById('pfill');
+  if(fill)fill.style.width=pct+'%';
+  const pctEl=document.querySelector('.progress-pct');
+  if(pctEl)pctEl.textContent=pct+'%';
+  const sub=document.querySelector('.progress-sub');
+  if(sub)sub.textContent=`${done}/${total} 세트`;
+}
+
+// ── HISTORY ──
+function renderHistory(){
+  const dates=Object.keys(log).sort().reverse().slice(0,20);
+  let html='<p class="history-title">최근 운동 기록</p>';
+  if(!dates.length){html+='<p class="empty">아직 기록이 없습니다.</p>';}
+  else {
+    html+='<div class="hist-grid">';
+    dates.forEach(dk=>{
+      const d=new Date(dk);
+      const dow=DAYS[d.getDay()===0?6:d.getDay()-1];
+      const r=ROUTINE[dow];
+      if(!r)return;
+      const dayLog=log[dk];
+      let exHtml='';let hasData=false;
+      r.exercises.forEach((ex,ei)=>{
+        const sets=dayLog?.[ei];
+        if(!sets)return;
+        const entries=Object.entries(sets).filter(([,s])=>s.weight||s.reps);
+        if(!entries.length)return;
+        hasData=true;
+        exHtml+=`<div class="hist-ex">
+          <span class="hist-ex-name">${ex.name}</span>
+          <div class="hist-sets">
+            ${entries.map(([,s])=>`<span class="hist-set">${s.weight||'?'}kg × ${s.reps||'?'}${s.done?' ✓':''}</span>`).join('')}
+          </div>
+        </div>`;
+      });
+      if(!hasData)return;
+      html+=`<div class="hist-card" style="border-color:${r.color}">
+        <div class="hist-header" style="color:${r.color}">${r.icon} ${dk} (${dow}) — ${r.label}</div>
+        ${exHtml}
+      </div>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('page-history').innerHTML=html;
+}
+
+// ── INIT ──
+renderSidebar();
+renderWorkout();
+</script>
+</body>
+</html>
