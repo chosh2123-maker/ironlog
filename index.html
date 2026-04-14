@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -8,712 +8,735 @@
 <meta name="apple-mobile-web-app-title" content="IRON LOG">
 <meta name="theme-color" content="#0a0a0a">
 <title>IRON LOG</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--bg4:#222;
+  --border:#222;--border2:#2a2a2a;--border3:#333;
+  --text:#e8e8e8;--text2:#aaa;--text3:#666;--text4:#444;
+  --accent:#fff;--danger:#ff4444;--safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR','Apple SD Gothic Neo',-apple-system,sans-serif;height:100%;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none}
+#app{display:flex;height:100dvh;overflow:hidden}
 
-:root {
-  --bg: #0a0a0a;
-  --bg2: #111;
-  --bg3: #1a1a1a;
-  --border: #222;
-  --border2: #2a2a2a;
-  --text: #e8e8e8;
-  --text2: #aaa;
-  --text3: #555;
-  --radius: 12px;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-}
+/* ── SIDEBAR (iPad 768+) ── */
+#sidebar{width:260px;min-width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding-top:calc(var(--safe-top) + 20px);padding-left:calc(var(--safe-left) + 20px);padding-right:20px;padding-bottom:calc(var(--safe-bottom) + 20px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:767px){#sidebar{display:none!important}}
+.sb-logo{font-family:'Bebas Neue',Impact,sans-serif;font-size:30px;letter-spacing:5px;color:#fff}
+.sb-profile{display:flex;align-items:center;gap:8px;margin:8px 0 24px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);transition:border-color .15s}
+.sb-profile:hover{border-color:#444}
+.sb-profile-info{flex:1}
+.sb-profile-name{font-size:13px;font-weight:600;color:var(--text)}
+.sb-profile-sub{font-size:11px;color:var(--text3)}
+.sb-edit-icon{font-size:12px;color:var(--text4)}
+.sb-section{font-size:10px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;margin-top:4px}
+.sb-day{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:3px;border:1px solid transparent;transition:all .15s}
+.sb-day.rest{opacity:.3;pointer-events:none}
+.sb-day.sel{background:var(--bg3);border-color:var(--day-color)}
+.sb-dot{width:7px;height:7px;border-radius:50%;background:var(--text4);flex-shrink:0;transition:background .15s}
+.sb-day.sel .sb-dot{background:var(--day-color)}
+.sb-day-name{font-size:12px;color:var(--text2);transition:color .15s}
+.sb-day.sel .sb-day-name{color:var(--day-color);font-weight:700}
+.sb-day-sub{font-size:10px;color:var(--text4)}
+.sb-today{margin-left:auto;font-size:8px;background:#fff;color:#000;padding:2px 5px;border-radius:8px;font-weight:700}
+.sb-nav{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:3px}
+.sb-nav-btn{padding:9px 10px;border-radius:8px;border:none;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;text-align:left;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:8px}
+.sb-nav-btn.act{background:var(--bg3);color:#fff}
+.sb-nav-icon{font-size:16px;width:20px;text-align:center}
 
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', -apple-system, sans-serif;
-  height: 100%;
-  overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
-
-/* ── LAYOUT ── */
-#app {
-  display: flex;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-/* iPad: 사이드바 레이아웃 */
-@media (min-width: 768px) {
-  #sidebar {
-    width: 260px;
-    min-width: 260px;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding-top: calc(var(--safe-top) + 20px);
-    padding-left: calc(var(--safe-left) + 20px);
-    padding-right: 20px;
-    padding-bottom: 20px;
-  }
-  #main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  #mobile-header { display: none !important; }
-  #bottom-tabs { display: none !important; }
-}
-
-/* iPhone: 상단헤더 + 하단탭 레이아웃 */
-@media (max-width: 767px) {
-  #sidebar { display: none !important; }
-  #main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-}
-
-/* ── SIDEBAR (iPad) ── */
-#sidebar {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.sidebar-logo {
-  font-family: 'Bebas Neue', Impact, sans-serif;
-  font-size: 32px;
-  letter-spacing: 5px;
-  color: #fff;
-  margin-bottom: 4px;
-}
-.sidebar-badge {
-  font-size: 11px;
-  color: var(--text3);
-  margin-bottom: 28px;
-  display: block;
-}
-.sidebar-section {
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-.sidebar-day {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 4px;
-  border: 1px solid transparent;
-  transition: all .15s;
-}
-.sidebar-day.rest { opacity: 0.3; pointer-events: none; }
-.sidebar-day.selected { background: #1a1a1a; border-color: var(--accent); }
-.sidebar-day-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--text3);
-  flex-shrink: 0;
-}
-.sidebar-day.selected .sidebar-day-dot { background: var(--accent); }
-.sidebar-day-label { font-size: 13px; color: var(--text2); }
-.sidebar-day.selected .sidebar-day-label { color: var(--accent); font-weight: 700; }
-.sidebar-day-sub { font-size: 10px; color: var(--text3); }
-.today-badge {
-  margin-left: auto;
-  font-size: 9px;
-  background: #fff;
-  color: #000;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-weight: 700;
-}
-.sidebar-nav {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
-.sidebar-nav-btn {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  color: var(--text3);
-  font-size: 13px;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  transition: all .15s;
-}
-.sidebar-nav-btn.active { background: #1a1a1a; color: #fff; }
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
 /* ── MOBILE HEADER ── */
-#mobile-header {
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  padding: calc(var(--safe-top) + 12px) 20px 0;
-  flex-shrink: 0;
-}
-.mh-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-.mh-logo {
-  font-family: 'Bebas Neue', Impact, sans-serif;
-  font-size: 26px;
-  letter-spacing: 4px;
-  color: #fff;
-}
-.mh-badge {
-  font-size: 11px;
-  background: #1e1e1e;
-  color: var(--text3);
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid #333;
-}
-.mh-tabs { display: flex; }
-.mh-tab {
-  flex: 1;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text3);
-  padding: 10px 0;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all .2s;
-}
-.mh-tab.active { color: #fff; border-bottom-color: #fff; }
+#mh{background:var(--bg2);border-bottom:1px solid var(--border);padding:calc(var(--safe-top) + 10px) 16px 0;flex-shrink:0}
+@media(min-width:768px){#mh{display:none!important}}
+.mh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.mh-logo{font-family:'Bebas Neue',Impact,sans-serif;font-size:24px;letter-spacing:4px;color:#fff}
+.mh-profile{font-size:11px;background:var(--bg3);color:var(--text3);padding:4px 10px;border-radius:16px;border:1px solid var(--border2);cursor:pointer}
+.mh-tabs{display:flex}
+.mh-tab{flex:1;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text3);padding:9px 0;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s}
+.mh-tab.act{color:#fff;border-bottom-color:#fff}
 
-/* ── SCROLL AREA ── */
-#scroll-area {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
+/* ── SCROLL ── */
+#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 
 /* ── BOTTOM TABS (iPhone) ── */
-#bottom-tabs {
-  display: flex;
-  background: var(--bg2);
-  border-top: 1px solid var(--border);
-  padding-bottom: var(--safe-bottom);
-  flex-shrink: 0;
-}
-.bt-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 10px 0 8px;
-  font-size: 10px;
-  color: var(--text3);
-  cursor: pointer;
-  font-family: inherit;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  transition: color .15s;
-}
-.bt-btn.active { color: #fff; }
-.bt-icon { font-size: 20px; }
+#bt{display:flex;background:var(--bg2);border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);flex-shrink:0}
+@media(min-width:768px){#bt{display:none!important}}
+.bt-btn{flex:1;background:transparent;border:none;padding:8px 0 6px;font-size:9px;color:var(--text4);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
+.bt-btn.act{color:#fff}
+.bt-icon{font-size:19px}
+
+/* ── PAGES ── */
+.page{display:none}.page.act{display:block}
 
 /* ── DAY ROW (mobile) ── */
-.day-row {
-  display: flex;
-  gap: 6px;
-  padding: 16px 20px 0;
-  justify-content: center;
-}
-.day-btn {
-  width: 38px; height: 38px;
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  background: #151515;
-  color: var(--text2);
-  font-size: 12px;
-  cursor: pointer;
-  position: relative;
-  font-family: inherit;
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-.day-btn.rest { opacity: 0.3; pointer-events: none; }
-.day-btn.selected { border-width: 2px; font-weight: 700; background: #1a1a1a; }
-.today-dot {
-  position: absolute;
-  bottom: 3px; left: 50%;
-  transform: translateX(-50%);
-  width: 4px; height: 4px;
-  border-radius: 50%;
-  background: #fff;
-}
+.day-row{display:flex;gap:5px;padding:14px 16px 0;justify-content:center}
+.day-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:#151515;color:var(--text2);font-size:11px;cursor:pointer;position:relative;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.day-btn.rest{opacity:.3;pointer-events:none}
+.day-btn.sel{border-width:2px;font-weight:700;background:var(--bg3)}
+.today-dot{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:#fff}
 
 /* ── ROUTINE HEADER ── */
-.routine-header {
-  margin: 16px 20px 0;
-  padding: 16px;
-  background: var(--bg2);
-  border-radius: var(--radius);
-  border: 1px solid;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-@media (min-width: 768px) {
-  .routine-header { margin: 20px 24px 0; padding: 20px; }
-}
-.routine-icon { font-size: 28px; }
-.routine-label { font-size: 18px; font-weight: 700; margin-left: 8px; }
-.routine-desc { display: block; font-size: 11px; color: var(--text3); margin-top: 2px; margin-left: 36px; }
-.progress-wrap { text-align: right; min-width: 80px; }
-.progress-pct { font-size: 22px; font-weight: 700; color: #fff; }
-.progress-bar { height: 4px; background: #222; border-radius: 2px; margin-top: 4px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 2px; transition: width .3s ease; }
-.progress-sub { font-size: 10px; color: var(--text3); margin-top: 2px; display: block; }
+.r-header{margin:14px 16px 0;padding:14px;background:var(--bg2);border-radius:12px;border:1px solid;display:flex;justify-content:space-between;align-items:center;gap:10px}
+@media(min-width:768px){.r-header{margin:18px 20px 0;padding:16px}}
+.r-left{display:flex;flex-direction:column;gap:2px;min-width:0}
+.r-icon-row{display:flex;align-items:center;gap:8px}
+.r-icon{font-size:22px}
+.r-label{font-size:16px;font-weight:700}
+.r-desc{font-size:10px;color:var(--text3);margin-top:1px}
+.r-edit{font-size:11px;color:var(--text4);margin-top:4px;cursor:pointer;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);width:fit-content}
+.prog-wrap{text-align:right;min-width:72px;flex-shrink:0}
+.prog-pct{font-size:20px;font-weight:700;color:#fff}
+.prog-bar{height:3px;background:#222;border-radius:2px;margin-top:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .3s}
+.prog-sub{font-size:10px;color:var(--text3);margin-top:2px;display:block}
 
 /* ── EXERCISE LIST ── */
-.exercise-list {
-  padding: 12px 20px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-@media (min-width: 768px) {
-  .exercise-list { padding: 16px 24px 24px; }
-}
-
-/* iPad: 2열 그리드 */
-@media (min-width: 900px) {
-  .exercise-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-}
-
-.ex-card {
-  background: var(--bg2);
-  border-radius: 10px;
-  padding: 14px;
-  border: 1px solid #1e1e1e;
-}
-.ex-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  align-items: center;
-}
-.ex-name { font-weight: 600; font-size: 14px; color: #ddd; }
-.ex-rep { font-size: 11px; font-weight: 600; }
-.set-grid {
-  display: grid;
-  grid-template-columns: 24px 1fr 1fr 36px;
-  gap: 6px;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.set-label { font-size: 10px; color: #444; text-align: center; }
-.set-num { font-size: 12px; color: var(--text3); text-align: center; }
-.set-input {
-  background: #1a1a1a;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: #ddd;
-  font-size: 15px;
-  padding: 8px 4px;
-  text-align: center;
-  width: 100%;
-  font-family: inherit;
-  outline: none;
-  -webkit-appearance: none;
-}
-.set-input:focus { border-color: #555; }
-.check-btn {
-  width: 36px; height: 36px;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background: transparent;
-  cursor: pointer;
-  font-size: 16px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s;
-  font-family: inherit;
-}
-.set-row.done { opacity: 0.4; }
+.ex-list{padding:10px 16px 20px;display:flex;flex-direction:column;gap:10px}
+@media(min-width:768px){.ex-list{padding:14px 20px 24px}}
+@media(min-width:900px){.ex-list{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+.ex-card{background:var(--bg2);border-radius:10px;padding:12px;border:1px solid #1e1e1e}
+.ex-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}
+.ex-name-wrap{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.ex-name{font-weight:600;font-size:13px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex-rep{font-size:10px;font-weight:600;flex-shrink:0}
+.ex-actions{display:flex;gap:4px;flex-shrink:0}
+.ex-action-btn{background:transparent;border:1px solid var(--border2);border-radius:5px;color:var(--text4);font-size:10px;padding:2px 6px;cursor:pointer;font-family:inherit;transition:all .15s}
+.ex-action-btn:hover{color:var(--text2);border-color:#444}
+.ex-action-btn.del{color:#ff4444;border-color:#ff4444}
+.set-head{display:grid;grid-template-columns:22px 1fr 1fr 34px;gap:5px;margin-bottom:4px}
+.set-lbl{font-size:9px;color:var(--text4);text-align:center}
+.set-row{display:grid;grid-template-columns:22px 1fr 1fr 34px;gap:5px;margin-bottom:5px;align-items:center;transition:opacity .2s}
+.set-row.done{opacity:.4}
+.set-num{font-size:11px;color:var(--text4);text-align:center}
+.set-input{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:#ddd;font-size:14px;padding:7px 3px;text-align:center;width:100%;font-family:inherit;outline:none;-webkit-appearance:none}
+.set-input:focus{border-color:#555}
+.chk-btn{width:34px;height:34px;border-radius:5px;border:1px solid #444;background:transparent;cursor:pointer;font-size:14px;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit}
+.add-set-btn{width:100%;margin-top:4px;padding:6px;background:transparent;border:1px dashed var(--border2);border-radius:6px;color:var(--text4);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.add-set-btn:hover{border-color:#444;color:var(--text2)}
+.add-ex-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;background:transparent;border:1px dashed var(--border2);border-radius:10px;color:var(--text4);font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s}
+.add-ex-btn:hover{border-color:#555;color:var(--text2)}
 
 /* ── HISTORY ── */
-.history-wrap { padding: 20px; }
-@media (min-width: 768px) { .history-wrap { padding: 24px; } }
-.history-title { font-size: 13px; color: var(--text3); margin-bottom: 14px; }
+.hist-wrap{padding:16px}
+@media(min-width:768px){.hist-wrap{padding:20px}}
+.hist-title{font-size:12px;color:var(--text4);margin-bottom:12px}
+.hist-grid{display:flex;flex-direction:column;gap:10px}
+@media(min-width:768px){.hist-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+.hist-card{background:var(--bg2);border-radius:10px;border:1px solid;padding:12px}
+.hist-hd{font-size:12px;font-weight:700;margin-bottom:8px}
+.hist-ex{margin-bottom:6px}
+.hist-ex-name{font-size:11px;color:#777;display:block;margin-bottom:3px}
+.hist-sets{display:flex;flex-wrap:wrap;gap:4px}
+.hist-set{font-size:10px;background:var(--bg3);padding:2px 7px;border-radius:4px;color:#ccc}
+.empty{color:var(--text4);font-size:12px;text-align:center;margin-top:60px}
 
-@media (min-width: 768px) {
-  .hist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-}
+/* ── SETTINGS PAGE ── */
+.settings-wrap{padding:16px}
+@media(min-width:768px){.settings-wrap{padding:20px}}
+.settings-section{margin-bottom:24px}
+.settings-title{font-size:10px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.settings-card{background:var(--bg2);border-radius:10px;border:1px solid var(--border);overflow:hidden}
+.settings-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-row-label{font-size:13px;color:var(--text2);flex:1}
+.settings-row-sub{font-size:11px;color:var(--text4)}
+.settings-input{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:#ddd;font-size:13px;padding:6px 10px;text-align:right;width:90px;font-family:inherit;outline:none;-webkit-appearance:none}
+.settings-input:focus{border-color:#555}
+.settings-input.wide{width:160px;text-align:left}
+.settings-btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.settings-btn:hover{border-color:#555;color:#fff}
+.settings-btn.danger{border-color:#ff4444;color:#ff4444}
+.day-edit-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.day-edit-row:last-child{border-bottom:none}
+.day-toggle{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.day-toggle.on{background:#fff}
+.day-toggle.off{background:var(--border)}
+.day-toggle-knob{position:absolute;top:2px;width:16px;height:16px;border-radius:50%;background:#000;transition:left .2s}
+.day-toggle.on .day-toggle-knob{left:18px}
+.day-toggle.off .day-toggle-knob{left:2px}
+.day-edit-label{font-size:13px;color:var(--text2);flex:1}
+.day-edit-sub{font-size:10px;color:var(--text4)}
+.color-row{display:flex;gap:6px;flex-wrap:wrap}
+.color-chip{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.color-chip.sel{border-color:#fff}
+.icon-row{display:flex;gap:6px;flex-wrap:wrap}
+.icon-chip{width:32px;height:32px;border-radius:8px;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.icon-chip.sel{border-color:#fff;background:var(--bg4)}
 
-.hist-card {
-  background: var(--bg2);
-  border-radius: 10px;
-  border: 1px solid;
-  padding: 14px;
-  margin-bottom: 12px;
-}
-@media (min-width: 768px) { .hist-card { margin-bottom: 0; } }
-.hist-header { margin-bottom: 10px; font-size: 13px; font-weight: 700; }
-.hist-ex { margin-bottom: 8px; }
-.hist-ex-name { font-size: 12px; color: #777; display: block; margin-bottom: 4px; }
-.hist-sets { display: flex; flex-wrap: wrap; gap: 6px; }
-.hist-set {
-  font-size: 11px;
-  background: #1a1a1a;
-  padding: 3px 8px;
-  border-radius: 4px;
-  color: #ccc;
-}
-.empty { color: #444; font-size: 13px; text-align: center; margin-top: 60px; }
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+@media(min-width:768px){.modal-bg{align-items:center}}
+.modal{background:var(--bg2);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px;padding-bottom:calc(20px + var(--safe-bottom));border-top:1px solid var(--border)}
+@media(min-width:768px){.modal{border-radius:16px;max-width:400px;border:1px solid var(--border)}}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;color:#fff}
+.modal-label{font-size:11px;color:var(--text3);margin-bottom:6px;display:block}
+.modal-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:#ddd;font-size:14px;padding:10px 12px;font-family:inherit;outline:none;margin-bottom:12px;-webkit-appearance:none}
+.modal-input:focus{border-color:#555}
+.modal-row{display:flex;gap:8px;margin-bottom:12px}
+.modal-row .modal-input{margin-bottom:0}
+.modal-btns{display:flex;gap:8px;margin-top:4px}
+.modal-btn{flex:1;padding:11px;border-radius:8px;border:none;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s}
+.modal-btn.cancel{background:var(--bg3);color:var(--text2)}
+.modal-btn.confirm{background:#fff;color:#000}
+.modal-btn.del-confirm{background:#ff4444;color:#fff}
 
-/* ── PAGE ── */
-.page { display: none; }
-.page.active { display: block; }
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(80px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:#fff;color:#000;font-size:12px;font-weight:600;padding:8px 16px;border-radius:20px;opacity:0;transition:all .3s;pointer-events:none;z-index:200;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:768px){.toast{bottom:30px}}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- iPad 사이드바 -->
-  <div id="sidebar">
-    <div class="sidebar-logo">IRON LOG</div>
-    <span class="sidebar-badge">80kg · 180cm · 근비대</span>
-    <div class="sidebar-section">이번 주 루틴</div>
-    <div id="sidebar-days"></div>
-    <div class="sidebar-nav">
-      <button class="sidebar-nav-btn active" onclick="switchTab('workout',this)">🏋️ 오늘 운동</button>
-      <button class="sidebar-nav-btn" onclick="switchTab('history',this)">📋 기록 보기</button>
+<!-- iPad 사이드바 -->
+<div id="sidebar">
+  <div class="sb-logo">IRON LOG</div>
+  <div class="sb-profile" onclick="showTab('settings')">
+    <div class="sb-profile-info">
+      <div class="sb-profile-name" id="sb-profile-name">—</div>
+      <div class="sb-profile-sub" id="sb-profile-sub">—</div>
     </div>
+    <div class="sb-edit-icon">✏️</div>
   </div>
-
-  <!-- 메인 영역 -->
-  <div id="main">
-    <!-- iPhone 헤더 -->
-    <div id="mobile-header">
-      <div class="mh-top">
-        <span class="mh-logo">IRON LOG</span>
-        <span class="mh-badge">80kg · 180cm</span>
-      </div>
-      <div class="mh-tabs">
-        <button class="mh-tab active" onclick="switchTab('workout',this)">오늘 운동</button>
-        <button class="mh-tab" onclick="switchTab('history',this)">기록 보기</button>
-      </div>
-    </div>
-
-    <!-- 스크롤 영역 -->
-    <div id="scroll-area">
-      <div id="page-workout" class="page active"></div>
-      <div id="page-history" class="page"></div>
-    </div>
-
-    <!-- iPhone 하단 탭 -->
-    <div id="bottom-tabs">
-      <button class="bt-btn active" onclick="switchTab('workout',this)">
-        <span class="bt-icon">🏋️</span>오늘 운동
-      </button>
-      <button class="bt-btn" onclick="switchTab('history',this)">
-        <span class="bt-icon">📋</span>기록 보기
-      </button>
-    </div>
+  <div class="sb-section">이번 주 루틴</div>
+  <div id="sb-days"></div>
+  <div class="sb-nav">
+    <button class="sb-nav-btn act" onclick="showTab('workout',this)"><span class="sb-nav-icon">🏋️</span>오늘 운동</button>
+    <button class="sb-nav-btn" onclick="showTab('history',this)"><span class="sb-nav-icon">📋</span>기록 보기</button>
+    <button class="sb-nav-btn" onclick="showTab('settings',this)"><span class="sb-nav-icon">⚙️</span>설정</button>
   </div>
 </div>
 
+<!-- 메인 -->
+<div id="main">
+  <!-- 모바일 헤더 -->
+  <div id="mh">
+    <div class="mh-top">
+      <span class="mh-logo">IRON LOG</span>
+      <span class="mh-profile" id="mh-profile" onclick="showTab('settings')">⚙️ 설정</span>
+    </div>
+    <div class="mh-tabs">
+      <button class="mh-tab act" onclick="showTab('workout',this)">운동</button>
+      <button class="mh-tab" onclick="showTab('history',this)">기록</button>
+      <button class="mh-tab" onclick="showTab('settings',this)">설정</button>
+    </div>
+  </div>
+
+  <div id="scroll">
+    <div id="page-workout" class="page act"></div>
+    <div id="page-history" class="page"></div>
+    <div id="page-settings" class="page"></div>
+  </div>
+
+  <div id="bt">
+    <button class="bt-btn act" onclick="showTab('workout',this)"><span class="bt-icon">🏋️</span>운동</button>
+    <button class="bt-btn" onclick="showTab('history',this)"><span class="bt-icon">📋</span>기록</button>
+    <button class="bt-btn" onclick="showTab('settings',this)"><span class="bt-icon">⚙️</span>설정</button>
+  </div>
+</div>
+</div>
+
+<!-- 모달 -->
+<div id="modal-bg" class="modal-bg" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
+
 <script>
-const ROUTINE = {
-  월:{label:"상체 Push",color:"#FF6B35",icon:"💪",desc:"가슴 · 어깨 · 삼두",exercises:[
-    {name:"바벨 벤치프레스",sets:4,rep:"6–8"},
-    {name:"인클라인 덤벨 프레스",sets:3,rep:"8–10"},
-    {name:"케이블 플라이",sets:3,rep:"12–15"},
-    {name:"덤벨 숄더프레스",sets:3,rep:"8–10"},
-    {name:"레터럴 레이즈",sets:3,rep:"12–15"},
-    {name:"트라이셉스 푸시다운",sets:3,rep:"12–15"},
-  ]},
-  화:{label:"하체 + 코어",color:"#4ECDC4",icon:"🦵",desc:"대퇴 · 햄스트링 · 코어",exercises:[
-    {name:"바벨 스쿼트",sets:4,rep:"6–8"},
-    {name:"루마니안 데드리프트",sets:3,rep:"8–10"},
-    {name:"레그 프레스",sets:3,rep:"10–12"},
-    {name:"레그 컬 (머신)",sets:3,rep:"12–15"},
-    {name:"카프 레이즈",sets:4,rep:"15–20"},
-    {name:"플랭크",sets:3,rep:"60초"},
-  ]},
-  목:{label:"상체 Pull",color:"#A855F7",icon:"🏋️",desc:"등 · 이두",exercises:[
-    {name:"바벨 데드리프트",sets:4,rep:"5–6"},
-    {name:"렛풀다운",sets:3,rep:"8–10"},
-    {name:"시티드 케이블 로우",sets:3,rep:"10–12"},
-    {name:"덤벨 원암 로우",sets:3,rep:"10–12"},
-    {name:"페이스풀",sets:3,rep:"15"},
-    {name:"바벨 컬",sets:3,rep:"10–12"},
-  ]},
-  금:{label:"하체 + 어깨 보조",color:"#F59E0B",icon:"⚡",desc:"하체 · 후면 삼각근",exercises:[
-    {name:"핵 스쿼트",sets:4,rep:"8–10"},
-    {name:"불가리안 스플릿 스쿼트",sets:3,rep:"10 (각)"},
-    {name:"레그 익스텐션",sets:3,rep:"12–15"},
-    {name:"시티드 카프 레이즈",sets:3,rep:"15–20"},
-    {name:"리어 델트 플라이",sets:3,rep:"15"},
-    {name:"업라이트 로우",sets:3,rep:"12"},
-  ]},
+// ── 기본 데이터 ──
+const DEFAULT = {
+  profile: { name:'승환', weight:80, height:180 },
+  days: ['월','화','수','목','금','토','일'],
+  routineDays: {
+    월:{label:'상체 Push',color:'#FF6B35',icon:'💪',desc:'가슴 · 어깨 · 삼두',active:true,exercises:[
+      {name:'바벨 벤치프레스',sets:4,rep:'6–8'},{name:'인클라인 덤벨 프레스',sets:3,rep:'8–10'},
+      {name:'케이블 플라이',sets:3,rep:'12–15'},{name:'덤벨 숄더프레스',sets:3,rep:'8–10'},
+      {name:'레터럴 레이즈',sets:3,rep:'12–15'},{name:'트라이셉스 푸시다운',sets:3,rep:'12–15'},
+    ]},
+    화:{label:'하체 + 코어',color:'#4ECDC4',icon:'🦵',desc:'대퇴 · 햄스트링 · 코어',active:true,exercises:[
+      {name:'바벨 스쿼트',sets:4,rep:'6–8'},{name:'루마니안 데드리프트',sets:3,rep:'8–10'},
+      {name:'레그 프레스',sets:3,rep:'10–12'},{name:'레그 컬 (머신)',sets:3,rep:'12–15'},
+      {name:'카프 레이즈',sets:4,rep:'15–20'},{name:'플랭크',sets:3,rep:'60초'},
+    ]},
+    수:{label:'휴식',color:'#555',icon:'🛌',desc:'',active:false,exercises:[]},
+    목:{label:'상체 Pull',color:'#A855F7',icon:'🏋️',desc:'등 · 이두',active:true,exercises:[
+      {name:'바벨 데드리프트',sets:4,rep:'5–6'},{name:'렛풀다운',sets:3,rep:'8–10'},
+      {name:'시티드 케이블 로우',sets:3,rep:'10–12'},{name:'덤벨 원암 로우',sets:3,rep:'10–12'},
+      {name:'페이스풀',sets:3,rep:'15'},{name:'바벨 컬',sets:3,rep:'10–12'},
+    ]},
+    금:{label:'하체 + 어깨 보조',color:'#F59E0B',icon:'⚡',desc:'하체 · 후면 삼각근',active:true,exercises:[
+      {name:'핵 스쿼트',sets:4,rep:'8–10'},{name:'불가리안 스플릿 스쿼트',sets:3,rep:'10 (각)'},
+      {name:'레그 익스텐션',sets:3,rep:'12–15'},{name:'시티드 카프 레이즈',sets:3,rep:'15–20'},
+      {name:'리어 델트 플라이',sets:3,rep:'15'},{name:'업라이트 로우',sets:3,rep:'12'},
+    ]},
+    토:{label:'휴식',color:'#555',icon:'🛌',desc:'',active:false,exercises:[]},
+    일:{label:'휴식',color:'#555',icon:'🛌',desc:'',active:false,exercises:[]},
+  }
 };
-const DAYS=["월","화","수","목","금","토","일"];
-const REST=["수","토","일"];
-const KEY="ironlog_v2";
 
-let log=JSON.parse(localStorage.getItem(KEY)||"{}");
-let selDay=(()=>{const d=new Date();const k=DAYS[d.getDay()===0?6:d.getDay()-1];return REST.includes(k)?"월":k;})();
-let curTab="workout";
+const DAYS = ['월','화','수','목','금','토','일'];
+const COLORS = ['#FF6B35','#4ECDC4','#A855F7','#F59E0B','#3B82F6','#10B981','#EC4899','#F43F5E','#8B5CF6','#06B6D4'];
+const ICONS = ['💪','🦵','🏋️','⚡','🔥','🎯','💥','🏃','🧘','🛌'];
+const KEY = 'ironlog_v3';
 
-function todayDow(){const d=new Date();return DAYS[d.getDay()===0?6:d.getDay()-1];}
+// ── 저장소 ──
+function loadData() {
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY));
+    if (!d) return JSON.parse(JSON.stringify(DEFAULT));
+    // merge defaults for missing keys
+    if (!d.profile) d.profile = DEFAULT.profile;
+    DAYS.forEach(day => {
+      if (!d.routineDays[day]) d.routineDays[day] = DEFAULT.routineDays[day];
+    });
+    return d;
+  } catch { return JSON.parse(JSON.stringify(DEFAULT)); }
+}
+function saveData() { localStorage.setItem(KEY, JSON.stringify(data)); }
 
-function getDateKey(day){
-  const today=new Date();
-  const ti=today.getDay()===0?6:today.getDay()-1;
-  const di=DAYS.indexOf(day);
-  const d=new Date(today);
-  d.setDate(today.getDate()+(di-ti));
+let data = loadData();
+let log = JSON.parse(localStorage.getItem(KEY+'_log') || '{}');
+function saveLog() { localStorage.setItem(KEY+'_log', JSON.stringify(log)); }
+
+// ── 상태 ──
+let selDay = (() => {
+  const dow = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay()-1];
+  return data.routineDays[dow]?.active ? dow : DAYS.find(d => data.routineDays[d]?.active) || '월';
+})();
+let curTab = 'workout';
+
+// ── 유틸 ──
+function todayDow() { return DAYS[new Date().getDay()===0?6:new Date().getDay()-1]; }
+function getDateKey(day) {
+  const today = new Date(), ti = today.getDay()===0?6:today.getDay()-1;
+  const d = new Date(today); d.setDate(today.getDate()+(DAYS.indexOf(day)-ti));
   return d.toISOString().slice(0,10);
 }
-
-function saveLog(){localStorage.setItem(KEY,JSON.stringify(log));}
-
-function getEntry(dk,ei,si){return log?.[dk]?.[ei]?.[si]||{weight:"",reps:"",done:false};}
-
-function setEntry(dk,ei,si,field,val){
-  if(!log[dk])log[dk]={};
-  if(!log[dk][ei])log[dk][ei]={};
-  if(!log[dk][ei][si])log[dk][ei][si]={weight:"",reps:"",done:false};
-  log[dk][ei][si][field]=val;
-  saveLog();
+function getEntry(dk,ei,si) { return log?.[dk]?.[ei]?.[si]||{weight:'',reps:'',done:false}; }
+function setEntry(dk,ei,si,field,val) {
+  if(!log[dk])log[dk]={};if(!log[dk][ei])log[dk][ei]={};
+  if(!log[dk][ei][si])log[dk][ei][si]={weight:'',reps:'',done:false};
+  log[dk][ei][si][field]=val;saveLog();
 }
-
-function calcProg(dk,r){
-  if(!r)return{done:0,total:0};
+function calcProg(dk, r) {
+  if(!r||!r.active)return{done:0,total:0};
   let done=0,total=0;
-  r.exercises.forEach((ex,ei)=>{
-    for(let si=0;si<ex.sets;si++){total++;if(getEntry(dk,ei,si).done)done++;}
-  });
+  r.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++){total++;if(getEntry(dk,ei,si).done)done++;}});
   return{done,total};
 }
-
-// ── TAB SWITCH ──
-function switchTab(tab, btn){
-  curTab=tab;
-  // mobile header tabs
-  document.querySelectorAll('.mh-tab').forEach(t=>t.classList.remove('active'));
-  // bottom tabs
-  document.querySelectorAll('.bt-btn').forEach(t=>t.classList.remove('active'));
-  // sidebar nav
-  document.querySelectorAll('.sidebar-nav-btn').forEach(t=>t.classList.remove('active'));
-
-  if(btn) btn.classList.add('active');
-  // sync all matching tabs
-  if(tab==='workout'){
-    document.querySelectorAll('.mh-tab')[0]?.classList.add('active');
-    document.querySelectorAll('.bt-btn')[0]?.classList.add('active');
-    document.querySelectorAll('.sidebar-nav-btn')[0]?.classList.add('active');
-  } else {
-    document.querySelectorAll('.mh-tab')[1]?.classList.add('active');
-    document.querySelectorAll('.bt-btn')[1]?.classList.add('active');
-    document.querySelectorAll('.sidebar-nav-btn')[1]?.classList.add('active');
-  }
-
-  document.getElementById('page-workout').classList.toggle('active',tab==='workout');
-  document.getElementById('page-history').classList.toggle('active',tab==='history');
-  if(tab==='history')renderHistory();
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-// ── SIDEBAR DAYS (iPad) ──
-function renderSidebar(){
-  const today=todayDow();
-  const el=document.getElementById('sidebar-days');
+// ── 탭 전환 ──
+function showTab(tab, btn) {
+  curTab = tab;
+  document.querySelectorAll('.mh-tab,.bt-btn,.sb-nav-btn').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('act'));
+  document.getElementById('page-'+tab).classList.add('act');
+  if(btn) btn.classList.add('act');
+  // sync all nav buttons for this tab
+  const idx = tab==='workout'?0:tab==='history'?1:2;
+  document.querySelectorAll('.mh-tab')[idx]?.classList.add('act');
+  document.querySelectorAll('.bt-btn')[idx]?.classList.add('act');
+  document.querySelectorAll('.sb-nav-btn')[idx]?.classList.add('act');
+
+  if(tab==='history') renderHistory();
+  if(tab==='settings') renderSettings();
+  document.getElementById('scroll').scrollTop=0;
+}
+
+// ── 사이드바 ──
+function renderSidebar() {
+  const today = todayDow();
+  const p = data.profile;
+  document.getElementById('sb-profile-name').textContent = p.name || '—';
+  document.getElementById('sb-profile-sub').textContent = `${p.weight||'—'}kg · ${p.height||'—'}cm`;
+  document.getElementById('mh-profile').textContent = `${p.weight||'—'}kg`;
+
   let html='';
   DAYS.forEach(d=>{
-    const r=ROUTINE[d];
-    const isRest=REST.includes(d);
+    const r=data.routineDays[d];
+    const isActive=r?.active;
     const isSel=d===selDay;
     const isToday=d===today;
     const color=r?.color||'#555';
-    const style=`--accent:${color}`;
-    html+=`<div class="sidebar-day${isRest?' rest':''}${isSel?' selected':''}" style="${style}" onclick="selectDay('${d}')">
-      <div class="sidebar-day-dot"></div>
-      <div>
-        <div class="sidebar-day-label">${d}${r?` — ${r.label}`:' — 휴식'}</div>
-        ${r?`<div class="sidebar-day-sub">${r.desc}</div>`:''}
+    html+=`<div class="sb-day${!isActive?' rest':''}${isSel?' sel':''}" style="--day-color:${color}" onclick="selectDay('${d}')">
+      <div class="sb-dot"></div>
+      <div style="min-width:0">
+        <div class="sb-day-name">${d} ${r?.label||'휴식'}</div>
+        ${r?.desc?`<div class="sb-day-sub">${r.desc}</div>`:''}
       </div>
-      ${isToday?'<span class="today-badge">TODAY</span>':''}
+      ${isToday?'<span class="sb-today">TODAY</span>':''}
     </div>`;
   });
-  el.innerHTML=html;
+  document.getElementById('sb-days').innerHTML=html;
 }
 
-// ── SELECT DAY ──
-function selectDay(d){
-  if(REST.includes(d))return;
-  selDay=d;
-  renderSidebar();
-  renderWorkout();
-  if(curTab!=='workout')switchTab('workout');
+// ── 요일 선택 ──
+function selectDay(d) {
+  if(!data.routineDays[d]?.active) return;
+  selDay=d; renderSidebar(); renderWorkout();
+  if(curTab!=='workout') showTab('workout');
 }
 
-// ── WORKOUT PAGE ──
-function renderWorkout(){
-  const dk=getDateKey(selDay);
-  const r=ROUTINE[selDay];
-  const today=todayDow();
-  const{done,total}=calcProg(dk,r);
-  const pct=total>0?Math.round(done/total*100):0;
+// ── 운동 페이지 ──
+function renderWorkout() {
+  const dk=getDateKey(selDay), r=data.routineDays[selDay], today=todayDow();
+  const {done,total}=calcProg(dk,r), pct=total>0?Math.round(done/total*100):0;
   let html='';
 
-  // Day row (mobile only — iPad uses sidebar)
-  html+='<div class="day-row" id="day-row-mobile">';
+  // 요일 버튼 (모바일)
+  html+='<div class="day-row">';
   DAYS.forEach(d=>{
-    const isRest=REST.includes(d);
-    const isSel=d===selDay;
-    const isToday=d===today;
-    const color=ROUTINE[d]?.color||'#555';
-    html+=`<button class="day-btn${isRest?' rest':''}${isSel?' selected':''}"
-      style="${isSel?`border-color:${color};color:${color};`:''}border-color:${isSel?color:''}"
-      onclick="selectDay('${d}')">
-      ${d}${isToday?'<span class="today-dot"></span>':''}
-    </button>`;
+    const isActive=data.routineDays[d]?.active;
+    const isSel=d===selDay, isToday=d===today;
+    const color=data.routineDays[d]?.color||'#555';
+    html+=`<button class="day-btn${!isActive?' rest':''}${isSel?' sel':''}"
+      style="${isSel?`border-color:${color};color:${color}`:''}"
+      onclick="selectDay('${d}')">${d}${isToday?'<span class="today-dot"></span>':''}</button>`;
   });
   html+='</div>';
 
-  if(!r){
-    html+='<p class="empty">오늘은 휴식일입니다 🛌</p>';
+  if(!r?.active) {
+    html+='<p class="empty">오늘은 휴식일입니다 🛌<br><small style="font-size:10px;color:#444;display:block;margin-top:8px">설정에서 운동 요일을 변경할 수 있습니다</small></p>';
   } else {
-    html+=`<div class="routine-header" style="border-color:${r.color}">
-      <div>
-        <span class="routine-icon">${r.icon}</span>
-        <span class="routine-label" style="color:${r.color}">${r.label}</span>
-        <span class="routine-desc">${r.desc}</span>
-      </div>
-      <div class="progress-wrap">
-        <span class="progress-pct">${pct}%</span>
-        <div class="progress-bar">
-          <div class="progress-fill" id="pfill" style="width:${pct}%;background:${r.color}"></div>
+    html+=`<div class="r-header" style="border-color:${r.color}">
+      <div class="r-left">
+        <div class="r-icon-row">
+          <span class="r-icon">${r.icon}</span>
+          <span class="r-label" style="color:${r.color}">${r.label}</span>
         </div>
-        <span class="progress-sub">${done}/${total} 세트</span>
+        ${r.desc?`<div class="r-desc">${r.desc}</div>`:''}
+        <div class="r-edit" onclick="modalEditDay('${selDay}')">✏️ 루틴 편집</div>
+      </div>
+      <div class="prog-wrap">
+        <span class="prog-pct">${pct}%</span>
+        <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:${pct}%;background:${r.color}"></div></div>
+        <span class="prog-sub">${done}/${total} 세트</span>
       </div>
     </div>`;
 
-    html+='<div class="exercise-list">';
+    html+='<div class="ex-list">';
     r.exercises.forEach((ex,ei)=>{
       html+=`<div class="ex-card">
-        <div class="ex-header">
-          <span class="ex-name">${ex.name}</span>
-          <span class="ex-rep" style="color:${r.color}">${ex.rep} reps</span>
+        <div class="ex-top">
+          <div class="ex-name-wrap">
+            <span class="ex-name">${ex.name}</span>
+          </div>
+          <span class="ex-rep" style="color:${r.color}">${ex.rep}</span>
+          <div class="ex-actions">
+            <button class="ex-action-btn" onclick="modalEditEx('${selDay}',${ei})">편집</button>
+            <button class="ex-action-btn del" onclick="deleteEx('${selDay}',${ei})">삭제</button>
+          </div>
         </div>
-        <div class="set-grid" style="margin-bottom:4px">
-          ${['세트','무게(kg)','횟수','완료'].map(l=>`<span class="set-label">${l}</span>`).join('')}
-        </div>`;
+        <div class="set-head"><span class="set-lbl">세트</span><span class="set-lbl">무게kg</span><span class="set-lbl">횟수</span><span class="set-lbl">완료</span></div>`;
       for(let si=0;si<ex.sets;si++){
         const e=getEntry(dk,ei,si);
-        html+=`<div class="set-row set-grid${e.done?' done':''}" id="row-${ei}-${si}">
+        html+=`<div class="set-row${e.done?' done':''}" id="row-${ei}-${si}">
           <span class="set-num">${si+1}</span>
-          <input class="set-input" type="number" inputmode="decimal" placeholder="—"
-            value="${e.weight}" onblur="setEntry('${dk}',${ei},${si},'weight',this.value)">
-          <input class="set-input" type="number" inputmode="numeric" placeholder="—"
-            value="${e.reps}" onblur="setEntry('${dk}',${ei},${si},'reps',this.value)">
-          <button class="check-btn" id="chk-${ei}-${si}"
+          <input class="set-input" type="number" inputmode="decimal" placeholder="—" value="${e.weight}"
+            onblur="setEntry('${dk}',${ei},${si},'weight',this.value)">
+          <input class="set-input" type="number" inputmode="numeric" placeholder="—" value="${e.reps}"
+            onblur="setEntry('${dk}',${ei},${si},'reps',this.value)">
+          <button class="chk-btn" id="chk-${ei}-${si}"
             style="background:${e.done?r.color:'transparent'};border-color:${e.done?r.color:'#444'}"
             onclick="toggleDone('${dk}',${ei},${si},'${r.color}')">
             ${e.done?'✓':''}
           </button>
         </div>`;
       }
+      html+=`<button class="add-set-btn" onclick="addSet('${selDay}',${ei})">+ 세트 추가</button>`;
       html+='</div>';
     });
+    html+=`<button class="add-ex-btn" onclick="modalAddEx('${selDay}')">＋ 운동 추가</button>`;
     html+='</div>';
   }
-
   document.getElementById('page-workout').innerHTML=html;
 }
 
-// ── TOGGLE DONE ──
-function toggleDone(dk,ei,si,color){
-  const cur=getEntry(dk,ei,si);
-  const nd=!cur.done;
-  setEntry(dk,ei,si,'done',nd);
-  const row=document.getElementById(`row-${ei}-${si}`);
-  const btn=document.getElementById(`chk-${ei}-${si}`);
-  if(row)row.classList.toggle('done',nd);
-  if(btn){btn.style.background=nd?color:'transparent';btn.style.borderColor=nd?color:'#444';btn.textContent=nd?'✓':'';}
-  // progress update
-  const r=ROUTINE[selDay];
-  const{done,total}=calcProg(dk,r);
-  const pct=total>0?Math.round(done/total*100):0;
-  const fill=document.getElementById('pfill');
-  if(fill)fill.style.width=pct+'%';
-  const pctEl=document.querySelector('.progress-pct');
-  if(pctEl)pctEl.textContent=pct+'%';
-  const sub=document.querySelector('.progress-sub');
-  if(sub)sub.textContent=`${done}/${total} 세트`;
+// ── 세트 추가/삭제 ──
+function addSet(day, ei) {
+  data.routineDays[day].exercises[ei].sets++;
+  saveData(); renderWorkout();
 }
 
-// ── HISTORY ──
-function renderHistory(){
-  const dates=Object.keys(log).sort().reverse().slice(0,20);
-  let html='<p class="history-title">최근 운동 기록</p>';
-  if(!dates.length){html+='<p class="empty">아직 기록이 없습니다.</p>';}
-  else {
-    html+='<div class="hist-grid">';
-    dates.forEach(dk=>{
-      const d=new Date(dk);
-      const dow=DAYS[d.getDay()===0?6:d.getDay()-1];
-      const r=ROUTINE[dow];
-      if(!r)return;
-      const dayLog=log[dk];
-      let exHtml='';let hasData=false;
-      r.exercises.forEach((ex,ei)=>{
-        const sets=dayLog?.[ei];
-        if(!sets)return;
-        const entries=Object.entries(sets).filter(([,s])=>s.weight||s.reps);
-        if(!entries.length)return;
-        hasData=true;
-        exHtml+=`<div class="hist-ex">
-          <span class="hist-ex-name">${ex.name}</span>
-          <div class="hist-sets">
-            ${entries.map(([,s])=>`<span class="hist-set">${s.weight||'?'}kg × ${s.reps||'?'}${s.done?' ✓':''}</span>`).join('')}
-          </div>
-        </div>`;
-      });
-      if(!hasData)return;
-      html+=`<div class="hist-card" style="border-color:${r.color}">
-        <div class="hist-header" style="color:${r.color}">${r.icon} ${dk} (${dow}) — ${r.label}</div>
-        ${exHtml}
-      </div>`;
+// ── 완료 토글 ──
+function toggleDone(dk,ei,si,color) {
+  const cur=getEntry(dk,ei,si), nd=!cur.done;
+  setEntry(dk,ei,si,'done',nd);
+  const row=document.getElementById(`row-${ei}-${si}`), btn=document.getElementById(`chk-${ei}-${si}`);
+  if(row)row.classList.toggle('done',nd);
+  if(btn){btn.style.background=nd?color:'transparent';btn.style.borderColor=nd?color:'#444';btn.textContent=nd?'✓':'';}
+  const r=data.routineDays[selDay], dk2=getDateKey(selDay);
+  const {done,total}=calcProg(dk2,r), pct=total>0?Math.round(done/total*100):0;
+  const fill=document.getElementById('pfill');if(fill)fill.style.width=pct+'%';
+  const pctEl=document.querySelector('.prog-pct');if(pctEl)pctEl.textContent=pct+'%';
+  const sub=document.querySelector('.prog-sub');if(sub)sub.textContent=`${done}/${total} 세트`;
+}
+
+// ── 운동 삭제 ──
+function deleteEx(day, ei) {
+  openModal(`
+    <div class="modal-title">운동 삭제</div>
+    <p style="font-size:13px;color:#aaa;margin-bottom:20px">"${data.routineDays[day].exercises[ei].name}"을(를) 삭제할까요?</p>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn del-confirm" onclick="confirmDeleteEx('${day}',${ei})">삭제</button>
+    </div>
+  `);
+}
+function confirmDeleteEx(day, ei) {
+  data.routineDays[day].exercises.splice(ei,1);
+  saveData(); closeModal(); renderWorkout(); toast('운동이 삭제되었습니다');
+}
+
+// ── 운동 편집 모달 ──
+function modalEditEx(day, ei) {
+  const ex = data.routineDays[day].exercises[ei];
+  openModal(`
+    <div class="modal-title">운동 편집</div>
+    <label class="modal-label">운동 이름</label>
+    <input class="modal-input" id="m-ex-name" value="${ex.name}" placeholder="운동 이름">
+    <label class="modal-label">목표 횟수 (예: 8–12)</label>
+    <input class="modal-input" id="m-ex-rep" value="${ex.rep}" placeholder="예: 8–12">
+    <label class="modal-label">세트 수</label>
+    <input class="modal-input" id="m-ex-sets" type="number" value="${ex.sets}" min="1" max="10">
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn confirm" onclick="confirmEditEx('${day}',${ei})">저장</button>
+    </div>
+  `);
+}
+function confirmEditEx(day, ei) {
+  const name=document.getElementById('m-ex-name').value.trim();
+  const rep=document.getElementById('m-ex-rep').value.trim();
+  const sets=parseInt(document.getElementById('m-ex-sets').value)||3;
+  if(!name){toast('이름을 입력해주세요');return;}
+  data.routineDays[day].exercises[ei]={...data.routineDays[day].exercises[ei],name,rep,sets};
+  saveData(); closeModal(); renderWorkout(); toast('저장되었습니다');
+}
+
+// ── 운동 추가 모달 ──
+function modalAddEx(day) {
+  openModal(`
+    <div class="modal-title">운동 추가</div>
+    <label class="modal-label">운동 이름</label>
+    <input class="modal-input" id="m-new-name" placeholder="예: 덤벨 컬">
+    <label class="modal-label">목표 횟수</label>
+    <input class="modal-input" id="m-new-rep" placeholder="예: 10–12">
+    <label class="modal-label">세트 수</label>
+    <input class="modal-input" id="m-new-sets" type="number" value="3" min="1" max="10">
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn confirm" onclick="confirmAddEx('${day}')">추가</button>
+    </div>
+  `);
+  setTimeout(()=>document.getElementById('m-new-name')?.focus(),100);
+}
+function confirmAddEx(day) {
+  const name=document.getElementById('m-new-name').value.trim();
+  const rep=document.getElementById('m-new-rep').value.trim()||'—';
+  const sets=parseInt(document.getElementById('m-new-sets').value)||3;
+  if(!name){toast('이름을 입력해주세요');return;}
+  data.routineDays[day].exercises.push({name,rep,sets});
+  saveData(); closeModal(); renderWorkout(); toast('운동이 추가되었습니다');
+}
+
+// ── 루틴 편집 모달 (요일별) ──
+function modalEditDay(day) {
+  const r = data.routineDays[day];
+  const colorBtns = COLORS.map(c=>`<div class="color-chip${r.color===c?' sel':''}" style="background:${c}" onclick="selectColor('${c}',this)"></div>`).join('');
+  const iconBtns = ICONS.map(i=>`<div class="icon-chip${r.icon===i?' sel':''}" onclick="selectIcon('${i}',this)">${i}</div>`).join('');
+  openModal(`
+    <div class="modal-title">${day}요일 루틴 편집</div>
+    <label class="modal-label">루틴 이름</label>
+    <input class="modal-input" id="m-day-label" value="${r.label}" placeholder="예: 상체 Push">
+    <label class="modal-label">설명 (선택)</label>
+    <input class="modal-input" id="m-day-desc" value="${r.desc||''}" placeholder="예: 가슴 · 어깨 · 삼두">
+    <label class="modal-label">색상</label>
+    <div class="color-row" id="color-row" style="margin-bottom:12px">${colorBtns}</div>
+    <label class="modal-label">아이콘</label>
+    <div class="icon-row" id="icon-row" style="margin-bottom:16px">${iconBtns}</div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn confirm" onclick="confirmEditDay('${day}')">저장</button>
+    </div>
+  `);
+}
+let _selColor=null, _selIcon=null;
+function selectColor(c, el) {
+  _selColor=c;
+  document.querySelectorAll('.color-chip').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function selectIcon(i, el) {
+  _selIcon=i;
+  document.querySelectorAll('.icon-chip').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function confirmEditDay(day) {
+  const label=document.getElementById('m-day-label').value.trim();
+  const desc=document.getElementById('m-day-desc').value.trim();
+  if(!label){toast('이름을 입력해주세요');return;}
+  const r=data.routineDays[day];
+  r.label=label; r.desc=desc;
+  if(_selColor)r.color=_selColor;
+  if(_selIcon)r.icon=_selIcon;
+  _selColor=null;_selIcon=null;
+  saveData(); closeModal(); renderWorkout(); renderSidebar(); toast('저장되었습니다');
+}
+
+// ── 기록 페이지 ──
+function renderHistory() {
+  const dates=Object.keys(log).sort().reverse().slice(0,30);
+  let html='<div class="hist-wrap"><p class="hist-title">최근 운동 기록</p>';
+  if(!dates.length){html+='<p class="empty">아직 기록이 없습니다.</p></div>';
+    document.getElementById('page-history').innerHTML=html;return;}
+  html+='<div class="hist-grid">';
+  dates.forEach(dk=>{
+    const d=new Date(dk), dow=DAYS[d.getDay()===0?6:d.getDay()-1];
+    const r=data.routineDays[dow];if(!r?.active)return;
+    const dayLog=log[dk];let exHtml='',hasData=false;
+    r.exercises.forEach((ex,ei)=>{
+      const sets=dayLog?.[ei];if(!sets)return;
+      const entries=Object.entries(sets).filter(([,s])=>s.weight||s.reps);if(!entries.length)return;
+      hasData=true;
+      exHtml+=`<div class="hist-ex"><span class="hist-ex-name">${ex.name}</span><div class="hist-sets">
+        ${entries.map(([,s])=>`<span class="hist-set">${s.weight||'?'}kg×${s.reps||'?'}${s.done?' ✓':''}</span>`).join('')}
+      </div></div>`;
     });
-    html+='</div>';
-  }
+    if(!hasData)return;
+    html+=`<div class="hist-card" style="border-color:${r.color}">
+      <div class="hist-hd" style="color:${r.color}">${r.icon} ${dk} (${dow})</div>
+      <div style="font-size:11px;color:#666;margin-bottom:8px">${r.label}</div>
+      ${exHtml}</div>`;
+  });
+  html+='</div></div>';
   document.getElementById('page-history').innerHTML=html;
 }
 
-// ── INIT ──
+// ── 설정 페이지 ──
+function renderSettings() {
+  const p=data.profile;
+  let html=`<div class="settings-wrap">
+    <div class="settings-section">
+      <div class="settings-title">프로필</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <span class="settings-row-label">이름</span>
+          <input class="settings-input wide" id="s-name" value="${p.name||''}" placeholder="이름" onblur="saveProfile()">
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">몸무게</span>
+          <input class="settings-input" id="s-weight" type="number" value="${p.weight||''}" placeholder="kg" onblur="saveProfile()">
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">키</span>
+          <input class="settings-input" id="s-height" type="number" value="${p.height||''}" placeholder="cm" onblur="saveProfile()">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">운동 요일 설정</div>
+      <div class="settings-card">`;
+  DAYS.forEach(d=>{
+    const r=data.routineDays[d];
+    html+=`<div class="day-edit-row">
+      <button class="day-toggle ${r.active?'on':'off'}" onclick="toggleDay('${d}',this)">
+        <div class="day-toggle-knob"></div>
+      </button>
+      <div style="flex:1;min-width:0">
+        <div class="day-edit-label">${d}요일</div>
+        <div class="day-edit-sub" id="day-sub-${d}">${r.active?r.label:'휴식'}</div>
+      </div>
+      ${r.active?`<button class="settings-btn" onclick="modalEditDay('${d}')">편집</button>`:''}
+    </div>`;
+  });
+  html+=`</div></div>
+
+    <div class="settings-section">
+      <div class="settings-title">데이터</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <span class="settings-row-label">운동 기록 초기화</span>
+          <button class="settings-btn danger" onclick="confirmResetLog()">초기화</button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">전체 초기화 (루틴 포함)</span>
+          <button class="settings-btn danger" onclick="confirmResetAll()">초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('page-settings').innerHTML=html;
+}
+
+function saveProfile() {
+  data.profile.name=(document.getElementById('s-name')?.value.trim()||'');
+  data.profile.weight=parseFloat(document.getElementById('s-weight')?.value)||0;
+  data.profile.height=parseFloat(document.getElementById('s-height')?.value)||0;
+  saveData(); renderSidebar(); toast('프로필이 저장되었습니다');
+}
+
+function toggleDay(day, btn) {
+  const r=data.routineDays[day];
+  r.active=!r.active;
+  if(r.active&&r.exercises.length===0){r.label='새 루틴';r.color='#3B82F6';r.icon='💪';}
+  if(!r.active){r.label='휴식';r.icon='🛌';}
+  btn.classList.toggle('on',r.active);btn.classList.toggle('off',!r.active);
+  const sub=document.getElementById(`day-sub-${day}`);if(sub)sub.textContent=r.active?r.label:'휴식';
+  // 편집 버튼 갱신
+  saveData(); renderSettings(); renderSidebar();
+}
+
+function confirmResetLog() {
+  openModal(`<div class="modal-title">운동 기록 초기화</div>
+    <p style="font-size:13px;color:#aaa;margin-bottom:20px">모든 운동 기록이 삭제됩니다. 루틴은 유지됩니다.</p>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn del-confirm" onclick="doResetLog()">초기화</button>
+    </div>`);
+}
+function doResetLog(){log={};saveLog();closeModal();toast('기록이 초기화되었습니다');}
+
+function confirmResetAll() {
+  openModal(`<div class="modal-title">전체 초기화</div>
+    <p style="font-size:13px;color:#aaa;margin-bottom:20px">루틴과 모든 기록이 삭제되고 기본값으로 돌아갑니다.</p>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn del-confirm" onclick="doResetAll()">초기화</button>
+    </div>`);
+}
+function doResetAll(){
+  data=JSON.parse(JSON.stringify(DEFAULT));saveData();
+  log={};saveLog();closeModal();
+  renderSidebar();renderWorkout();renderSettings();toast('초기화되었습니다');
+}
+
+// ── 모달 ──
+function openModal(content) {
+  _selColor=null;_selIcon=null;
+  document.getElementById('modal').innerHTML=content;
+  document.getElementById('modal-bg').style.display='flex';
+}
+function closeModal(e) {
+  if(e&&e.target!==document.getElementById('modal-bg'))return;
+  document.getElementById('modal-bg').style.display='none';
+}
+
+// ── 초기화 ──
 renderSidebar();
 renderWorkout();
 </script>
